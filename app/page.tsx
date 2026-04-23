@@ -1,65 +1,213 @@
-import Image from "next/image";
+import Link from "next/link"
+import { Navbar } from "@/components/public/Navbar"
+import { Footer } from "@/components/public/Footer"
+import { Button } from "@/components/ui/button"
+import {
+  Scale, FileText, ShieldCheck, Lightbulb, Award,
+  Building2, MessageSquare, ArrowRight, CheckCircle2
+} from "lucide-react"
 
-export default function Home() {
+const services = [
+  { icon: Building2,    slug: "corporate-law",           name: "Business & Corporate Law",    desc: "Start and govern your company the right way" },
+  { icon: FileText,     slug: "contracts-transactions",  name: "Contracts & Transactions",    desc: "Protect your deals from start to finish" },
+  { icon: ShieldCheck,  slug: "regulatory-compliance",   name: "Regulatory Compliance",       desc: "Stay on the right side of every regulation" },
+  { icon: Lightbulb,    slug: "startup-sme",             name: "Startup & SME Advisory",      desc: "Legal support built for founders moving fast" },
+  { icon: Award,    slug: "intellectual-property",   name: "Intellectual Property",        desc: "Protect what makes your business unique" },
+  { icon: Scale,        slug: "property-transactions",   name: "Property Transactions",       desc: "Secure your real estate with full legal backing" },
+  { icon: MessageSquare, slug: "general-advisory",       name: "General Legal Advisory",      desc: "Ongoing legal intelligence for growing businesses" },
+]
+
+const clientTypes = [
+  "Pre-seed Startups", "Growth-stage Startups", "SMEs", "Investment Firms",
+  "Venture Studios", "Real Estate Investors", "Corporate Organisations", "Individual Founders",
+]
+
+const comparison = [
+  { them: "Reactive to problems",              us: "Proactively prevents problems" },
+  { them: "Document-focused",                  us: "Business-growth oriented" },
+  { them: "Engaged after problems arise",       us: "Embedded before issues occur" },
+  { them: "Generic legal output",              us: "Legal + commercial thinking combined" },
+]
+
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+
+      {/* ── Hero ──────────────────────────────────────────────────────── */}
+      <section className="bg-doda-navy text-white py-24 lg:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-doda-gold text-sm font-semibold uppercase tracking-widest mb-4">
+            Doda Legal Practitioners
+          </p>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight mb-6">
+            Start right.{" "}
+            <span className="text-doda-gold">Operate securely.</span>{" "}
+            Scale sustainably.
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed">
+            Doda Legal Practitioners provides legal structure, compliance, and transaction support
+            that enables businesses to launch, operate, and grow — without legal blind spots.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg">
+              <Link href="/book">Book a Consultation</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline"
+              className="border-white text-white hover:bg-white hover:text-doda-navy">
+              <Link href="/services">Explore Our Services</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Problem Statement ─────────────────────────────────────────── */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-doda-navy text-center mb-4">
+            Why most Nigerian businesses fail legally
+          </h2>
+          <p className="text-center text-doda-muted mb-12 text-lg">
+            Three blind spots that leave companies exposed:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { icon: "⚠️", text: "Contracts go unsigned or unenforceable" },
+              { icon: "⚠️", text: "Founders operate without governance structures" },
+              { icon: "⚠️", text: "Compliance is reactive — not strategic" },
+            ].map((item, i) => (
+              <div key={i} className="text-center p-8 rounded-2xl bg-doda-light border border-gray-100">
+                <span className="text-4xl mb-4 block">{item.icon}</span>
+                <p className="text-doda-navy font-medium text-lg">{item.text}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-center mt-10 text-lg font-semibold text-doda-navy italic">
+            Doda exists to change that.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* ── Services Snapshot ─────────────────────────────────────────── */}
+      <section className="py-20 bg-doda-light">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-doda-navy mb-3">What We Do</h2>
+            <p className="text-doda-muted text-lg">
+              Seven practice areas built around the full business lifecycle.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {services.map(({ icon: Icon, slug, name, desc }) => (
+              <Link key={slug} href={`/services/${slug}`}
+                className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-doda-gold hover:shadow-md transition-all">
+                <Icon className="w-8 h-8 text-doda-gold mb-3" />
+                <h3 className="font-semibold text-doda-navy mb-1.5 group-hover:text-doda-gold transition-colors">
+                  {name}
+                </h3>
+                <p className="text-sm text-doda-muted leading-relaxed">{desc}</p>
+                <span className="inline-flex items-center gap-1 mt-3 text-xs font-medium text-doda-gold">
+                  Learn More <ArrowRight className="w-3 h-3" />
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
-      </main>
+      </section>
+
+      {/* ── How It Works ──────────────────────────────────────────────── */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl font-bold text-doda-navy mb-3">How working with Doda works</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            {[
+              { step: "01", title: "Book a Consultation", desc: "Tell us about your business and legal needs" },
+              { step: "02", title: "Get a Legal Assessment", desc: "We identify your risks, gaps, and opportunities" },
+              { step: "03", title: "We Get to Work", desc: "Ongoing or project-based — your legal infrastructure is covered" },
+            ].map((item) => (
+              <div key={item.step} className="text-center">
+                <div className="w-14 h-14 bg-doda-gold/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-doda-gold font-bold text-lg">{item.step}</span>
+                </div>
+                <h3 className="font-bold text-doda-navy text-lg mb-2">{item.title}</h3>
+                <p className="text-doda-muted">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center">
+            <Button asChild>
+              <Link href="/book">Book your first session</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Client Types ──────────────────────────────────────────────── */}
+      <section className="py-20 bg-doda-light">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold text-doda-navy mb-4">
+            Built for businesses at every stage
+          </h2>
+          <p className="text-doda-muted text-lg mb-10">
+            From founding a startup to running a corporate — we have the legal coverage for your stage.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3 mb-10">
+            {clientTypes.map((type) => (
+              <span key={type}
+                className="px-4 py-2 rounded-full bg-white border border-gray-200 text-sm font-medium text-doda-navy hover:border-doda-gold hover:text-doda-gold transition-colors cursor-default">
+                {type}
+              </span>
+            ))}
+          </div>
+          <Button asChild variant="outline">
+            <Link href="/clients">Find out how we serve your type of business</Link>
+          </Button>
+        </div>
+      </section>
+
+      {/* ── Why Doda ──────────────────────────────────────────────────── */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-doda-navy text-center mb-12">The Doda difference</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Header */}
+            <div className="bg-gray-100 rounded-xl p-5 font-bold text-doda-muted text-sm uppercase tracking-wider">
+              Most Law Firms
+            </div>
+            <div className="bg-doda-navy rounded-xl p-5 font-bold text-doda-gold text-sm uppercase tracking-wider">
+              Doda
+            </div>
+            {comparison.map(({ them, us }, i) => (
+              <>
+                <div key={`them-${i}`}
+                  className="bg-gray-50 rounded-xl p-5 text-gray-600 flex items-center gap-3">
+                  <span className="text-red-400 text-lg">✗</span> {them}
+                </div>
+                <div key={`us-${i}`}
+                  className="bg-doda-light rounded-xl p-5 text-doda-navy font-medium flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-doda-gold flex-shrink-0" /> {us}
+                </div>
+              </>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Footer CTA Banner ─────────────────────────────────────────── */}
+      <section className="py-16 bg-doda-gold">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+            "Your business deserves legal infrastructure — not legal afterthoughts."
+          </h2>
+          <Button asChild size="lg" variant="navy">
+            <Link href="/book">Start with a Legal Audit</Link>
+          </Button>
+        </div>
+      </section>
+
+      <Footer />
     </div>
-  );
+  )
 }
