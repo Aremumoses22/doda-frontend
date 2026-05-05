@@ -63,6 +63,7 @@ export default function NewClientPage() {
         leadId: leadId || undefined,
       }
       if (data.clientType === "company") {
+        payload.clientType = "corporate"
         payload.companyName = data.companyName
       } else {
         payload.individualName = `${data.individualFirstName} ${data.individualLastName}`.trim()

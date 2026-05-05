@@ -17,7 +17,7 @@ import { toast } from "sonner"
 interface Client { _id: string; companyName?: string; individualName?: string; primaryEmail: string }
 interface Matter { _id: string; title: string; matterCode: string }
 
-interface LineItem { description: string; quantity: number; rate: number }
+interface LineItem { description: string; quantity: number; unitPrice: number }
 
 export default function NewInvoicePage() {
   const router = useRouter()
@@ -29,7 +29,7 @@ export default function NewInvoicePage() {
   const [matters, setMatters] = useState<Matter[]>([])
   const [selectedClient, setSelectedClient] = useState(defaultClientId)
   const [selectedMatter, setSelectedMatter] = useState(defaultMatterId)
-  const [lineItems, setLineItems] = useState<LineItem[]>([{ description: "", quantity: 1, rate: 0 }])
+  const [lineItems, setLineItems] = useState<LineItem[]>([{ description: "", quantity: 1, unitPrice: 0 }])
   const [taxRate, setTaxRate] = useState(7.5)
   const [dueDate, setDueDate] = useState("")
   const [notes, setNotes]     = useState("")
@@ -44,13 +44,13 @@ export default function NewInvoicePage() {
     api.get(`/api/matters?clientId=${selectedClient}&limit=50`).then(r => setMatters(r.data.matters ?? [])).catch(() => {})
   }, [selectedClient])
 
-  const addLine = () => setLineItems(prev => [...prev, { description: "", quantity: 1, rate: 0 }])
+  const addLine = () => setLineItems(prev => [...prev, { description: "", quantity: 1, unitPrice: 0 }])
   const removeLine = (i: number) => setLineItems(prev => prev.filter((_, idx) => idx !== i))
   const updateLine = (i: number, field: keyof LineItem, val: string | number) => {
     setLineItems(prev => prev.map((item, idx) => idx === i ? { ...item, [field]: val } : item))
   }
 
-  const subtotal = lineItems.reduce((sum, l) => sum + (Number(l.quantity) * Number(l.rate)), 0)
+  const subtotal = lineItems.reduce((sum, l) => sum + (Number(l.quantity) * Number(l.unitPrice)), 0)
   const tax      = subtotal * (taxRate / 100)
   const total    = subtotal + tax
 
@@ -64,8 +64,16 @@ export default function NewInvoicePage() {
       const res = await api.post("/api/invoices", {
         clientId: selectedClient,
         matterId: selectedMatter || undefined,
-        lineItems: lineItems.map(l => ({ description: l.description, quantity: Number(l.quantity), rate: Number(l.rate) })),
+        lineItems: lineItems.map(l => ({
+          description: l.description,
+          quantity: Number(l.quantity),
+          unitPrice: Number(l.unitPrice),
+          total: Number(l.quantity) * Number(l.unitPrice),
+        })),
         taxRate,
+        subtotal,
+        vatAmount: tax,
+        total,
         dueDate: dueDate || undefined,
         notes: notes || undefined,
       })
@@ -138,10 +146,10 @@ export default function NewInvoicePage() {
                     placeholder="Legal services..." />
                   <Input className="col-span-2 text-sm" type="number" min="1" value={item.quantity}
                     onChange={e => updateLine(i, "quantity", e.target.value)} />
-                  <Input className="col-span-3 text-sm" type="number" min="0" value={item.rate}
-                    onChange={e => updateLine(i, "rate", e.target.value)} />
+                  <Input className="col-span-3 text-sm" type="number" min="0" value={item.unitPrice}
+                    onChange={e => updateLine(i, "unitPrice", e.target.value)} />
                   <div className="col-span-1 text-right text-sm font-medium text-gray-700">
-                    ₦{(Number(item.quantity) * Number(item.rate)).toLocaleString()}
+                    ₦{(Number(item.quantity) * Number(item.unitPrice)).toLocaleString()}
                   </div>
                   <div className="col-span-1 flex justify-end">
                     {lineItems.length > 1 && (

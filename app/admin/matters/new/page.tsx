@@ -27,8 +27,20 @@ interface FormValues {
   dueDate: string
 }
 
-const PRACTICE_AREAS = ["corporate", "litigation", "real_estate", "employment", "intellectual_property", "tax", "family", "criminal", "immigration"]
-const PRIORITIES = ["low", "medium", "high", "urgent"]
+const PRACTICE_AREAS: { value: string; label: string }[] = [
+  { value: "corporate_law",    label: "Corporate Law" },
+  { value: "contracts",        label: "Contracts" },
+  { value: "compliance",       label: "Compliance" },
+  { value: "startup_sme",      label: "Startup & SME" },
+  { value: "ip",               label: "Intellectual Property" },
+  { value: "property",         label: "Property Law" },
+  { value: "general_advisory", label: "General Advisory" },
+]
+const PRIORITIES: { value: string; label: string }[] = [
+  { value: "high",   label: "High" },
+  { value: "normal", label: "Normal" },
+  { value: "low",    label: "Low" },
+]
 
 export default function NewMatterPage() {
   const router = useRouter()
@@ -40,7 +52,7 @@ export default function NewMatterPage() {
   const [saving, setSaving]   = useState(false)
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormValues>({
-    defaultValues: { clientId: defaultClientId, priority: "medium", practiceArea: "corporate" },
+    defaultValues: { clientId: defaultClientId, priority: "normal", practiceArea: "corporate_law" },
   })
 
   useEffect(() => {
@@ -122,22 +134,22 @@ export default function NewMatterPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>Practice Area *</Label>
-                <Select defaultValue="corporate" onValueChange={v => setValue("practiceArea", v)}>
+                <Select defaultValue="corporate_law" onValueChange={v => setValue("practiceArea", v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {PRACTICE_AREAS.map(a => (
-                      <SelectItem key={a} value={a} className="capitalize">{a.replace("_", " ")}</SelectItem>
+                      <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="grid gap-2">
                 <Label>Priority</Label>
-                <Select defaultValue="medium" onValueChange={v => setValue("priority", v)}>
+                <Select defaultValue="normal" onValueChange={v => setValue("priority", v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {PRIORITIES.map(p => (
-                      <SelectItem key={p} value={p} className="capitalize">{p}</SelectItem>
+                      <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
