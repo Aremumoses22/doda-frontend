@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -22,20 +22,23 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 export default function LoginClient() {
   const router       = useRouter()
-  const searchParams = useSearchParams()
   const { login, user } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
+  const [fromPath, setFromPath] = useState<string | null>(null)
+
+  useEffect(() => {
+    setFromPath(new URLSearchParams(window.location.search).get("from"))
+  }, [])
 
   useEffect(() => {
     if (user) {
-      const from = searchParams.get("from")
       if (user.role === "client") {
-        router.replace(from?.startsWith("/dashboard") ? from : "/dashboard")
+        router.replace(fromPath?.startsWith("/dashboard") ? fromPath : "/dashboard")
       } else {
-        router.replace(from?.startsWith("/admin") ? from : "/admin")
+        router.replace(fromPath?.startsWith("/admin") ? fromPath : "/admin")
       }
     }
-  }, [user, router, searchParams])
+  }, [user, router, fromPath])
 
   const {
     register,
@@ -46,11 +49,10 @@ export default function LoginClient() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       const { role } = await login(data.email, data.password)
-      const from = searchParams.get("from")
       if (role === "client") {
-        router.replace(from?.startsWith("/dashboard") ? from : "/dashboard")
+        router.replace(fromPath?.startsWith("/dashboard") ? fromPath : "/dashboard")
       } else {
-        router.replace(from?.startsWith("/admin") ? from : "/admin")
+        router.replace(fromPath?.startsWith("/admin") ? fromPath : "/admin")
       }
     } catch (err: unknown) {
       const msg =
