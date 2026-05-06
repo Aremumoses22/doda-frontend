@@ -16,7 +16,14 @@ export async function proxy(req: NextRequest) {
   }
 
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
+    const jwtSecret = process.env.JWT_SECRET
+    if (!jwtSecret) {
+      const response = NextResponse.redirect(new URL("/login", req.url))
+      response.cookies.delete("doda_token")
+      return response
+    }
+
+    const secret = new TextEncoder().encode(jwtSecret)
     const { payload } = await jwtVerify(token, secret)
     const role = payload.role as string
 
