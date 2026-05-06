@@ -38,7 +38,8 @@ interface Matter {
   assignedToId: { _id: string; firstName: string; lastName: string; email: string } | null
   supervisorId: { _id: string; firstName: string; lastName: string } | null
   dueDate?: string
-  openedDate: string
+  startDate?: string
+  createdAt: string
   tasks: Task[]
 }
 
@@ -199,7 +200,7 @@ export default function MatterDetailPage() {
                 <CardContent className="grid grid-cols-2 gap-4 text-sm">
                   <InfoRow label="Client" value={clientName} />
                   <InfoRow label="Practice Area" value={matter.practiceArea.replace("_", " ")} />
-                  <InfoRow label="Opened" value={format(new Date(matter.openedDate), "d MMM yyyy")} />
+                  <InfoRow label="Opened" value={format(new Date(matter.startDate ?? matter.createdAt), "d MMM yyyy")} />
                   {matter.dueDate && <InfoRow label="Due Date" value={format(new Date(matter.dueDate), "d MMM yyyy")} />}
                   {matter.assignedToId && <InfoRow label="Assigned Lawyer" value={`${matter.assignedToId.firstName} ${matter.assignedToId.lastName}`} />}
                   {matter.supervisorId && <InfoRow label="Supervisor" value={`${matter.supervisorId.firstName} ${matter.supervisorId.lastName}`} />}

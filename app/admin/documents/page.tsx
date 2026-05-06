@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react"
 import { useSearchParams } from "next/navigation"
-import { Upload, Download, Trash2, Search, FileText, Eye } from "lucide-react"
+import { Upload, Download, Trash2, Search, FileText } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -15,21 +15,21 @@ import { api } from "@/lib/api"
 import { format } from "date-fns"
 import { toast } from "sonner"
 
+// Matches backend Document model field `category`
 interface Doc {
   _id: string
-  title: string
-  documentType: string
+  name: string
+  category: string
   fileSize?: number
-  mimeType?: string
   status: string
   visibleToClient: boolean
   clientId?: { companyName?: string; individualName?: string } | null
   matterId?: { title: string; matterCode: string } | null
-  uploadedBy?: { firstName: string; lastName: string } | null
+  uploadedById?: { firstName: string; lastName: string } | null
   createdAt: string
 }
 
-const DOC_TYPES = ["all", "contract", "court_filing", "correspondence", "invoice", "retainer_agreement", "evidence", "memo", "other"]
+const CATEGORIES = ["all", "contract", "agreement", "advisory", "compliance", "id_document", "financial", "correspondence", "other"]
 
 export default function DocumentsPage() {
   const searchParams = useSearchParams()
@@ -37,10 +37,10 @@ export default function DocumentsPage() {
   const [total, setTotal]     = useState(0)
   const [loading, setLoading] = useState(true)
   const [search, setSearch]   = useState("")
-  const [docType, setDocType] = useState("all")
+  const [category, setCategory] = useState("all")
   const [page, setPage]       = useState(1)
   const [uploadModal, setUploadModal] = useState(false)
-  const [uploadForm, setUploadForm]   = useState({ title: "", documentType: "contract", clientId: "", matterId: "", visibleToClient: false })
+  const [uploadForm, setUploadForm]   = useState({ name: "", category: "contract", clientId: "", matterId: "", visibleToClient: false })
   const [uploadFile, setUploadFile]   = useState<File | null>(null)
   const [uploading, setUploading]     = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -53,7 +53,7 @@ export default function DocumentsPage() {
     setLoading(true)
     const params = new URLSearchParams({ page: String(page), limit: String(PER_PAGE) })
     if (search) params.set("search", search)
-    if (docType !== "all") params.set("documentType", docType)
+    if (category !== "all") params.set("category", category)
     if (clientId) params.set("clientId", clientId)
     if (matterId) params.set("matterId", matterId)
     api.get(`/api/documents?${params}`)
@@ -62,7 +62,7 @@ export default function DocumentsPage() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { fetchDocs() }, [page, search, docType])
+  useEffect(() => { fetchDocs() }, [page, search, category])
 
   const download = async (doc: Doc) => {
     try {
@@ -82,16 +82,16 @@ export default function DocumentsPage() {
   }
 
   const uploadDocument = async () => {
-    if (!uploadFile || !uploadForm.title) {
-      toast.error("Please provide a title and select a file")
+    if (!uploadFile || !uploadForm.name) {
+      toast.error("Please provide a name and select a file")
       return
     }
     setUploading(true)
     try {
       const form = new FormData()
       form.append("file", uploadFile)
-      form.append("title", uploadForm.title)
-      form.append("documentType", uploadForm.documentType)
+      form.append("name", uploadForm.name)
+      form.append("category", uploadForm.category)
       form.append("visibleToClient", String(uploadForm.visibleToClient))
       if (uploadForm.clientId) form.append("clientId", uploadForm.clientId)
       if (uploadForm.matterId) form.append("matterId", uploadForm.matterId)
@@ -100,7 +100,7 @@ export default function DocumentsPage() {
       setTotal(prev => prev + 1)
       setUploadModal(false)
       setUploadFile(null)
-      setUploadForm({ title: "", documentType: "contract", clientId: "", matterId: "", visibleToClient: false })
+      setUploadForm({ name: "", category: "contract", clientId: "", matterId: "", visibleToClient: false })
       toast.success("Document uploaded")
     } catch { toast.error("Upload failed") }
     finally { setUploading(false) }
@@ -132,11 +132,11 @@ export default function DocumentsPage() {
           <Input className="pl-9" placeholder="Search documents..." value={search}
             onChange={e => { setSearch(e.target.value); setPage(1) }} />
         </div>
-        <Select value={docType} onValueChange={v => { setDocType(v); setPage(1) }}>
+        <Select value={category} onValueChange={v => { setCategory(v); setPage(1) }}>
           <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
           <SelectContent>
-            {DOC_TYPES.map(t => (
-              <SelectItem key={t} value={t} className="capitalize">{t === "all" ? "All Types" : t.replace("_", " ")}</SelectItem>
+            {CATEGORIES.map(c => (
+              <SelectItem key={c} value={c} className="capitalize">{c === "all" ? "All Categories" : c.replace(/_/g, " ")}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -148,7 +148,7 @@ export default function DocumentsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Document</TableHead>
-                <TableHead>Type</TableHead>
+                <TableHead>Category</TableHead>
                 <TableHead>Client</TableHead>
                 <TableHead>Matter</TableHead>
                 <TableHead>Size</TableHead>
@@ -172,10 +172,12 @@ export default function DocumentsPage() {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <FileText className="h-4 w-4 text-gray-400 shrink-0" />
-                      <span className="font-medium text-sm text-doda-navy">{d.title}</span>
+                      <span className="font-medium text-sm text-doda-navy">{d.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell><Badge variant="outline" className="capitalize text-xs">{d.documentType.replace("_", " ")}</Badge></TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="capitalize text-xs">{d.category.replace(/_/g, " ")}</Badge>
+                  </TableCell>
                   <TableCell className="text-sm text-gray-600">
                     {d.clientId?.companyName || d.clientId?.individualName || "—"}
                   </TableCell>
@@ -192,7 +194,7 @@ export default function DocumentsPage() {
                     {format(new Date(d.createdAt), "d MMM yyyy")}
                   </TableCell>
                   <TableCell className="text-xs text-gray-500">
-                    {d.uploadedBy ? `${d.uploadedBy.firstName} ${d.uploadedBy.lastName}` : "—"}
+                    {d.uploadedById ? `${d.uploadedById.firstName} ${d.uploadedById.lastName}` : "—"}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
@@ -227,17 +229,17 @@ export default function DocumentsPage() {
           <DialogHeader><DialogTitle>Upload Document</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div className="grid gap-2">
-              <Label>Document Title *</Label>
-              <Input value={uploadForm.title} onChange={e => setUploadForm(f => ({ ...f, title: e.target.value }))}
+              <Label>Document Name *</Label>
+              <Input value={uploadForm.name} onChange={e => setUploadForm(f => ({ ...f, name: e.target.value }))}
                 placeholder="e.g. Board Resolution 2024" />
             </div>
             <div className="grid gap-2">
-              <Label>Document Type</Label>
-              <Select value={uploadForm.documentType} onValueChange={v => setUploadForm(f => ({ ...f, documentType: v }))}>
+              <Label>Category</Label>
+              <Select value={uploadForm.category} onValueChange={v => setUploadForm(f => ({ ...f, category: v }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {DOC_TYPES.filter(t => t !== "all").map(t => (
-                    <SelectItem key={t} value={t} className="capitalize">{t.replace("_", " ")}</SelectItem>
+                  {CATEGORIES.filter(c => c !== "all").map(c => (
+                    <SelectItem key={c} value={c} className="capitalize">{c.replace(/_/g, " ")}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

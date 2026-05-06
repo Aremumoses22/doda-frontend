@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 import { Navbar } from "@/components/public/Navbar"
 import { Footer } from "@/components/public/Footer"
 import { Button } from "@/components/ui/button"
@@ -23,8 +24,18 @@ export default function AboutPage() {
       <Navbar />
 
       {/* Page header */}
-      <section className="bg-doda-navy text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative bg-doda-navy text-white py-16 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="https://images.unsplash.com/photo-1568992688065-536aad8a12f6?w=1600&auto=format&fit=crop&q=80"
+            alt="Modern legal office"
+            fill
+            priority
+            className="object-cover opacity-15"
+            sizes="100vw"
+          />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-doda-gold text-sm font-semibold uppercase tracking-widest mb-3">About Us</p>
           <h1 className="text-4xl lg:text-5xl font-bold">Who We Are</h1>
         </div>
@@ -62,8 +73,14 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-doda-navy mb-8">The Principal</h2>
           <div className="flex flex-col sm:flex-row gap-8">
-            <div className="w-32 h-32 rounded-full bg-doda-gold/20 flex items-center justify-center flex-shrink-0">
-              <span className="text-4xl font-bold text-doda-gold">OO</span>
+            <div className="w-32 h-32 rounded-full overflow-hidden flex-shrink-0 bg-doda-gold/10 relative">
+              <Image
+                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=256&auto=format&fit=crop&q=80"
+                alt="Oladoyin Odetunde, Principal"
+                fill
+                className="object-cover"
+                sizes="128px"
+              />
             </div>
             <div>
               <h3 className="text-xl font-bold text-doda-navy">Oladoyin Odetunde</h3>

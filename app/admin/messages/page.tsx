@@ -13,11 +13,11 @@ import { toast } from "sonner"
 
 interface Message {
   _id: string
-  subject?: string
   body: string
   senderId: { _id: string; firstName: string; lastName: string } | null
-  recipientId: { _id: string; firstName: string; lastName: string } | null
-  isRead: boolean
+  clientId: { _id: string; companyName?: string; individualName?: string } | null
+  isRead?: boolean
+  readAt?: string
   createdAt: string
 }
 
@@ -29,39 +29,38 @@ interface Thread {
 }
 
 export default function MessagesPage() {
-  const searchParams = useSearchParams()
+  const searchParams  = useSearchParams()
   const defaultClientId = searchParams.get("clientId") ?? ""
 
-  const [threads, setThreads]           = useState<Thread[]>([])
-  const [selected, setSelected]         = useState<Thread | null>(null)
-  const [messages, setMessages]         = useState<Message[]>([])
-  const [search, setSearch]             = useState("")
-  const [newMsg, setNewMsg]             = useState("")
-  const [loading, setLoading]           = useState(true)
-  const [sending, setSending]           = useState(false)
+  const [threads, setThreads]   = useState<Thread[]>([])
+  const [selected, setSelected] = useState<Thread | null>(null)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [search, setSearch]     = useState("")
+  const [newMsg, setNewMsg]     = useState("")
+  const [loading, setLoading]   = useState(true)
+  const [sending, setSending]   = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     api.get("/api/messages?limit=200")
       .then(r => {
         const msgs: Message[] = r.data.messages ?? []
-        // Group by client
+        // Group by clientId
         const map = new Map<string, Thread>()
         msgs.forEach(m => {
-          // Determine client side: if sender is non-staff, they're the client
-          const clientSide = m.senderId
-          if (!clientSide) return
-          const clientId = clientSide._id
-          const clientName = `${clientSide.firstName} ${clientSide.lastName}`
-          if (!map.has(clientId)) {
-            map.set(clientId, { clientId, clientName, messages: [], unread: 0 })
+          if (!m.clientId) return
+          const cid  = m.clientId._id
+          const name = m.clientId.companyName || m.clientId.individualName || cid
+          if (!map.has(cid)) {
+            map.set(cid, { clientId: cid, clientName: name, messages: [], unread: 0 })
           }
-          const thread = map.get(clientId)!
+          const thread = map.get(cid)!
           thread.messages.push(m)
-          if (!m.isRead) thread.unread++
+          if (!m.readAt) thread.unread++
         })
-        setThreads(Array.from(map.values()))
-        // Auto-select if clientId in query param
+        const allThreads = Array.from(map.values())
+        setThreads(allThreads)
+        // Auto-select if clientId in query
         if (defaultClientId) {
           const t = map.get(defaultClientId)
           if (t) openThread(t)
@@ -75,9 +74,10 @@ export default function MessagesPage() {
     setSelected(thread)
     try {
       const res = await api.get(`/api/messages/client/${thread.clientId}`)
-      setMessages(res.data.messages ?? [])
+      const msgs: Message[] = res.data.messages ?? []
+      setMessages(msgs)
       // Mark unread as read
-      res.data.messages?.filter((m: Message) => !m.isRead).forEach((m: Message) => {
+      msgs.filter(m => !m.readAt).forEach(m => {
         api.patch(`/api/messages/${m._id}/read`).catch(() => {})
       })
     } catch { toast.error("Failed to load thread") }
@@ -89,7 +89,7 @@ export default function MessagesPage() {
     setSending(true)
     try {
       const res = await api.post("/api/messages", {
-        recipientId: selected.clientId,
+        clientId: selected.clientId,
         body: newMsg,
       })
       setMessages(prev => [...prev, res.data])
@@ -161,12 +161,17 @@ export default function MessagesPage() {
               </CardHeader>
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {messages.map(m => {
-                  const isMe = m.senderId?._id !== selected.clientId
+                  const isAdmin = m.senderId?._id !== selected.clientId
                   return (
-                    <div key={m._id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-                      <div className={`max-w-xs lg:max-w-md rounded-2xl px-4 py-2.5 text-sm ${isMe ? "bg-doda-navy text-white" : "bg-gray-100 text-gray-800"}`}>
+                    <div key={m._id} className={`flex ${isAdmin ? "justify-end" : "justify-start"}`}>
+                      <div className={`max-w-xs lg:max-w-md rounded-2xl px-4 py-2.5 text-sm ${isAdmin ? "bg-doda-navy text-white" : "bg-gray-100 text-gray-800"}`}>
+                        {!isAdmin && m.senderId && (
+                          <p className="text-xs font-semibold mb-1 text-doda-gold">
+                            {m.senderId.firstName} {m.senderId.lastName}
+                          </p>
+                        )}
                         <p>{m.body}</p>
-                        <p className={`text-xs mt-1 ${isMe ? "text-white/60" : "text-gray-400"}`}>
+                        <p className={`text-xs mt-1 ${isAdmin ? "text-white/60" : "text-gray-400"}`}>
                           {format(new Date(m.createdAt), "h:mm a · d MMM")}
                         </p>
                       </div>

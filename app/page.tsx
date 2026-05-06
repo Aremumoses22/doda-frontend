@@ -1,6 +1,8 @@
 import Link from "next/link"
+import Image from "next/image"
 import { Navbar } from "@/components/public/Navbar"
 import { Footer } from "@/components/public/Footer"
+import { HeroSlider } from "@/components/public/HeroSlider"
 import { Button } from "@/components/ui/button"
 import {
   Scale, FileText, ShieldCheck, Lightbulb, Award,
@@ -35,31 +37,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="bg-doda-navy text-white py-24 lg:py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-doda-gold text-sm font-semibold uppercase tracking-widest mb-4">
-            Doda Legal Practitioners
-          </p>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight mb-6">
-            Start right.{" "}
-            <span className="text-doda-gold">Operate securely.</span>{" "}
-            Scale sustainably.
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed">
-            Doda Legal Practitioners provides legal structure, compliance, and transaction support
-            that enables businesses to launch, operate, and grow — without legal blind spots.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg">
-              <Link href="/book">Book a Consultation</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline"
-              className="border-white text-white hover:bg-white hover:text-doda-navy">
-              <Link href="/services">Explore Our Services</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+      <HeroSlider />
 
       {/* ── Problem Statement ─────────────────────────────────────────── */}
       <section className="py-20 bg-white">
@@ -167,8 +145,37 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Why Doda ──────────────────────────────────────────────────── */}
+      {/* ── Team / Trust Section ──────────────────────────────────────── */}
       <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <p className="text-doda-gold text-sm font-semibold uppercase tracking-widest mb-3">The Principal</p>
+              <h2 className="text-3xl font-bold text-doda-navy mb-4">Business law, done right</h2>
+              <p className="text-gray-600 leading-relaxed mb-6">
+                Led by Oladoyin Odetunde, Doda Legal Practitioners combines sharp legal expertise
+                with a deep understanding of Nigerian business realities — so your legal counsel
+                is always commercially intelligent.
+              </p>
+              <Button asChild variant="outline">
+                <Link href="/about">Meet the team</Link>
+              </Button>
+            </div>
+            <div className="relative rounded-2xl overflow-hidden aspect-[4/3] shadow-lg">
+              <Image
+                src="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&auto=format&fit=crop&q=80"
+                alt="Legal professionals in a modern office"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Why Doda ──────────────────────────────────────────────────── */}
+      <section className="py-20 bg-doda-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-doda-navy text-center mb-12">The Doda difference</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -180,16 +187,14 @@ export default function HomePage() {
               Doda
             </div>
             {comparison.map(({ them, us }, i) => (
-              <>
-                <div key={`them-${i}`}
-                  className="bg-gray-50 rounded-xl p-5 text-gray-600 flex items-center gap-3">
+              <div key={i} className="contents">
+                <div className="bg-gray-50 rounded-xl p-5 text-gray-600 flex items-center gap-3">
                   <span className="text-red-400 text-lg">✗</span> {them}
                 </div>
-                <div key={`us-${i}`}
-                  className="bg-doda-light rounded-xl p-5 text-doda-navy font-medium flex items-center gap-3">
+                <div className="bg-white rounded-xl p-5 text-doda-navy font-medium flex items-center gap-3">
                   <CheckCircle2 className="w-5 h-5 text-doda-gold flex-shrink-0" /> {us}
                 </div>
-              </>
+              </div>
             ))}
           </div>
         </div>

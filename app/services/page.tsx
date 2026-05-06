@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 import { Navbar } from "@/components/public/Navbar"
 import { Footer } from "@/components/public/Footer"
 import { Button } from "@/components/ui/button"
@@ -70,8 +71,18 @@ export default function ServicesPage() {
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
-      <section className="bg-doda-navy text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative bg-doda-navy text-white py-16 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1600&auto=format&fit=crop&q=80"
+            alt="Legal documents and scales of justice"
+            fill
+            priority
+            className="object-cover opacity-15"
+            sizes="100vw"
+          />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-doda-gold text-sm font-semibold uppercase tracking-widest mb-3">Our Practice Areas</p>
           <h1 className="text-4xl lg:text-5xl font-bold mb-4">What We Do</h1>
           <p className="text-gray-300 text-lg max-w-2xl">

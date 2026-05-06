@@ -12,7 +12,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     fetchMe()
-  }, [])
+  }, [fetchMe])
 
   useEffect(() => {
     if (!isLoading && !user) router.replace("/login")

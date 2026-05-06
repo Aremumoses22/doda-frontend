@@ -86,7 +86,7 @@ export default function AdminDashboardPage() {
           activeClients:              clients.total ?? 0,
           openMatters:                matters.total ?? 0,
           outstandingInvoicesAmount:  outstandingTotal,
-          activeRetainers:            Array.isArray(retainers) ? retainers.length : 0,
+          activeRetainers:            retainers.retainers?.length ?? 0,
         })
 
         setRecentLeads(leads.leads.slice(0, 5))

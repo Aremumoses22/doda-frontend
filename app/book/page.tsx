@@ -5,6 +5,7 @@ import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "sonner"
+import Image from "next/image"
 import { Navbar } from "@/components/public/Navbar"
 import { Footer } from "@/components/public/Footer"
 import { Button } from "@/components/ui/button"
@@ -78,8 +79,18 @@ export default function BookPage() {
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
-      <section className="bg-doda-navy text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative bg-doda-navy text-white py-16 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1600&auto=format&fit=crop&q=80"
+            alt="Business consultation"
+            fill
+            priority
+            className="object-cover opacity-15"
+            sizes="100vw"
+          />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-doda-gold text-sm font-semibold uppercase tracking-widest mb-3">Get Started</p>
           <h1 className="text-4xl lg:text-5xl font-bold mb-3">Book a Consultation</h1>
           <p className="text-gray-300 text-lg max-w-xl">

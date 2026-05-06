@@ -35,8 +35,8 @@ interface Task {
 
 interface MatterDoc {
   _id: string
-  title: string
-  documentType: string
+  name: string
+  category: string
   fileUrl?: string
   status?: string
   createdAt: string
@@ -148,9 +148,9 @@ export default function MatterDetailPage() {
     try {
       const fd = new FormData()
       fd.append("file", file)
-      fd.append("title", file.name)
+      fd.append("name", file.name)
       fd.append("matterId", id)
-      fd.append("uploadedByClient", "true")
+      fd.append("visibleToClient", "false")
       await api.post("/api/documents", fd, { headers: { "Content-Type": "multipart/form-data" } })
       toast.success("File uploaded successfully")
       const r = await api.get(`/api/documents?matterId=${id}`)
@@ -305,8 +305,8 @@ export default function MatterDetailPage() {
               <div className="flex items-center gap-2 min-w-0">
                 <FileText className="h-4 w-4 text-doda-gold shrink-0" />
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-doda-navy truncate">{d.title}</p>
-                  <p className="text-xs text-gray-400 capitalize">{d.documentType.replace(/_/g, " ")}</p>
+                  <p className="text-sm font-medium text-doda-navy truncate">{d.name}</p>
+                  <p className="text-xs text-gray-400 capitalize">{d.category.replace(/_/g, " ")}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
@@ -315,7 +315,7 @@ export default function MatterDetailPage() {
                     {d.status}
                   </span>
                 )}
-                <Button size="sm" variant="ghost" onClick={() => downloadDoc(d._id, d.title)}>
+                <Button size="sm" variant="ghost" onClick={() => downloadDoc(d._id, d.name)}>
                   <Download className="h-4 w-4" />
                 </Button>
               </div>

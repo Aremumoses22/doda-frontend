@@ -11,7 +11,7 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from "axios"
  *  - Redirects to /login if refresh fails
  */
 export const api = axios.create({
-  baseURL:         process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
+  baseURL:         process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080",
   withCredentials: true,   // sends httpOnly refresh cookie automatically
   headers: {
     "Content-Type": "application/json",
@@ -75,7 +75,7 @@ api.interceptors.response.use(
     try {
       // Attempt to get a new access token using the httpOnly refresh cookie
       const { data } = await axios.post<{ accessToken: string }>(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/auth/refresh`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/api/auth/refresh`,
         {},
         { withCredentials: true }
       )

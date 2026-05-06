@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import {
-  FileText, Download, Eye, Search, Filter, Loader2
+  FileText, Download, Eye, Search, Loader2
 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -12,53 +12,55 @@ import { api } from "@/lib/api"
 import { format } from "date-fns"
 import { toast } from "sonner"
 
+// Matches backend Document model: `name`, `category`, `uploadedById`
 interface Doc {
   _id: string
-  title: string
-  documentType: string
+  name: string
+  category: string
   status?: string
   matterId?: { _id: string; title: string; matterCode?: string } | null
   createdAt: string
   fileUrl?: string
 }
 
-const docTypeLabels: Record<string, string> = {
-  contract: "Contract",
-  agreement: "Agreement",
-  affidavit: "Affidavit",
-  brief: "Brief",
+const categoryLabels: Record<string, string> = {
+  contract:       "Contract",
+  agreement:      "Agreement",
+  advisory:       "Advisory",
+  compliance:     "Compliance",
+  id_document:    "ID Document",
+  financial:      "Financial",
   correspondence: "Correspondence",
-  court_document: "Court Document",
-  invoice: "Invoice",
-  receipt: "Receipt",
-  other: "Other",
+  other:          "Other",
 }
 
 const statusColors: Record<string, string> = {
-  for_review: "bg-amber-50 text-amber-700",
-  awaiting_signature: "bg-blue-50 text-blue-700",
-  final: "bg-green-50 text-green-700",
-  draft: "bg-gray-100 text-gray-600",
+  under_review: "bg-amber-50 text-amber-700",
+  approved:     "bg-green-50 text-green-700",
+  signed:       "bg-blue-50 text-blue-700",
+  draft:        "bg-gray-100 text-gray-600",
+  archived:     "bg-gray-100 text-gray-400",
 }
 
 export default function DocumentsPage() {
   const [docs, setDocs]         = useState<Doc[]>([])
   const [loading, setLoading]   = useState(true)
   const [search, setSearch]     = useState("")
-  const [typeFilter, setType]   = useState("all")
+  const [catFilter, setCat]     = useState("all")
   const [statusFilter, setStatus] = useState("all")
 
   useEffect(() => {
-    api.get("/api/documents?visibleToClient=true&limit=100")
+    api.get("/api/documents?limit=100")
       .then(r => setDocs(r.data.documents ?? []))
+      .catch(() => toast.error("Failed to load documents"))
       .finally(() => setLoading(false))
   }, [])
 
-  async function handleDownload(docId: string, title: string) {
+  async function handleDownload(docId: string, name: string) {
     try {
       const r = await api.get(`/api/documents/${docId}/download`)
       const a = document.createElement("a")
-      a.href = r.data.url; a.target = "_blank"; a.download = title; a.click()
+      a.href = r.data.url; a.target = "_blank"; a.download = name; a.click()
     } catch { toast.error("Download failed") }
   }
 
@@ -70,10 +72,10 @@ export default function DocumentsPage() {
   }
 
   const filtered = docs.filter(d => {
-    const matchSearch = d.title.toLowerCase().includes(search.toLowerCase())
-    const matchType   = typeFilter === "all" || d.documentType === typeFilter
+    const matchSearch = d.name.toLowerCase().includes(search.toLowerCase())
+    const matchCat    = catFilter === "all" || d.category === catFilter
     const matchStatus = statusFilter === "all" || d.status === statusFilter
-    return matchSearch && matchType && matchStatus
+    return matchSearch && matchCat && matchStatus
   })
 
   return (
@@ -94,13 +96,13 @@ export default function DocumentsPage() {
             onChange={e => setSearch(e.target.value)}
           />
         </div>
-        <Select value={typeFilter} onValueChange={setType}>
+        <Select value={catFilter} onValueChange={setCat}>
           <SelectTrigger className="w-44">
-            <SelectValue placeholder="Document type" />
+            <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            {Object.entries(docTypeLabels).map(([v, l]) => (
+            <SelectItem value="all">All Categories</SelectItem>
+            {Object.entries(categoryLabels).map(([v, l]) => (
               <SelectItem key={v} value={v}>{l}</SelectItem>
             ))}
           </SelectContent>
@@ -111,9 +113,9 @@ export default function DocumentsPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="for_review">For Review</SelectItem>
-            <SelectItem value="awaiting_signature">Awaiting Signature</SelectItem>
-            <SelectItem value="final">Final</SelectItem>
+            <SelectItem value="under_review">Under Review</SelectItem>
+            <SelectItem value="approved">Approved</SelectItem>
+            <SelectItem value="signed">Signed</SelectItem>
             <SelectItem value="draft">Draft</SelectItem>
           </SelectContent>
         </Select>
@@ -139,17 +141,15 @@ export default function DocumentsPage() {
                     <FileText className="h-4 w-4 text-doda-gold" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-doda-navy truncate">{d.title}</p>
+                    <p className="text-sm font-semibold text-doda-navy truncate">{d.name}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-xs text-gray-400 capitalize">
-                        {docTypeLabels[d.documentType] ?? d.documentType}
+                        {categoryLabels[d.category] ?? d.category.replace(/_/g, " ")}
                       </span>
                       {d.matterId && (
                         <>
                           <span className="text-gray-200">•</span>
-                          <span className="text-xs text-gray-400">
-                            {d.matterId.title}
-                          </span>
+                          <span className="text-xs text-gray-400">{d.matterId.title}</span>
                         </>
                       )}
                     </div>
@@ -167,7 +167,7 @@ export default function DocumentsPage() {
                   <Button size="sm" variant="ghost" onClick={() => handleView(d._id)} title="View">
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => handleDownload(d._id, d.title)} title="Download">
+                  <Button size="sm" variant="ghost" onClick={() => handleDownload(d._id, d.name)} title="Download">
                     <Download className="h-4 w-4" />
                   </Button>
                 </div>

@@ -25,8 +25,8 @@ interface Matter {
 
 interface Doc {
   _id: string
-  title: string
-  documentType: string
+  name: string
+  category: string
   createdAt: string
 }
 
@@ -35,7 +35,7 @@ interface Message {
   body: string
   senderId: { firstName: string; lastName: string } | null
   createdAt: string
-  isRead: boolean
+  readAt?: string | null
 }
 
 interface Invoice {
@@ -107,7 +107,7 @@ export default function PortalHome() {
   const actionNeededCount  = matters.filter(m =>
     m.tasks.some(t => t.status === "pending")
   ).length
-  const unreadMessages     = messages.filter(m => !m.isRead).length
+  const unreadMessages     = messages.filter(m => !m.readAt).length
   const outstandingInvoices= invoices.filter(i => i.status === "sent" || i.status === "overdue")
   const outstandingTotal   = outstandingInvoices.reduce((s, i) => s + i.total, 0)
 
@@ -256,8 +256,8 @@ export default function PortalHome() {
                 <div className="flex items-center gap-2">
                   <FileText className="h-4 w-4 text-doda-gold shrink-0" />
                   <div>
-                    <p className="text-sm font-medium text-doda-navy">{d.title}</p>
-                    <p className="text-xs text-gray-400 capitalize">{d.documentType.replace("_", " ")}</p>
+                    <p className="text-sm font-medium text-doda-navy">{d.name}</p>
+                    <p className="text-xs text-gray-400 capitalize">{d.category.replace("_", " ")}</p>
                   </div>
                 </div>
                 <span className="text-xs text-gray-400">{format(new Date(d.createdAt), "d MMM")}</span>
@@ -285,7 +285,7 @@ export default function PortalHome() {
             ) : messages.length === 0 ? (
               <p className="text-sm text-gray-400 text-center py-4">No messages yet</p>
             ) : messages.slice(0, 4).map(msg => (
-              <div key={msg._id} className={`p-3 rounded-xl border ${!msg.isRead ? "bg-blue-50 border-blue-100" : "border-gray-100"}`}>
+              <div key={msg._id} className={`p-3 rounded-xl border ${!msg.readAt ? "bg-blue-50 border-blue-100" : "border-gray-100"}`}>
                 <div className="flex justify-between">
                   <p className="text-xs font-semibold text-gray-600">
                     {msg.senderId ? `${msg.senderId.firstName} ${msg.senderId.lastName}` : "Doda Legal"}

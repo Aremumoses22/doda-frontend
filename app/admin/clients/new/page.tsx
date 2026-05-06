@@ -178,8 +178,8 @@ export default function NewClientPage() {
                 <Select defaultValue="retainer" onValueChange={v => setValue("engagementType", v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {["retainer", "one_off", "pro_bono"].map(e => (
-                      <SelectItem key={e} value={e} className="capitalize">{e.replace("_", " ")}</SelectItem>
+                    {["retainer", "advisory", "transactional", "embedded"].map(e => (
+                      <SelectItem key={e} value={e} className="capitalize">{e}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
